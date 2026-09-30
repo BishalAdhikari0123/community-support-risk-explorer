@@ -16,7 +16,7 @@ st.markdown(
     """
     <style>
     @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
-    :root { --ink: #16324f; --muted: #475569; --sky: #b9e4f4; --blue: #005a8d; --amber: #b54708; --cream: #f5f7fa; --paper: #ffffff; --line: #cbd5e1; }
+    :root { --ink: #16324f; --muted: #475569; --sky: #b9e4f4; --blue: #005a8d; --green: #176b55; --amber: #b54708; --cream: #f5f7fa; --paper: #ffffff; --line: #cbd5e1; }
     .stApp { background: radial-gradient(circle at 100% 0%, #e5f2f8 0, transparent 29rem), var(--cream); color: var(--ink); }
     .block-container { max-width: 1440px; padding: 2.2rem 3.5rem 3rem; }
     h1, h2, h3 { font-family: 'Space Grotesk', sans-serif; color: var(--ink); }
@@ -35,6 +35,11 @@ st.markdown(
     [data-testid="stMetric"] { background: var(--paper); border: 1px solid var(--line); padding: 1rem 1.15rem; border-radius: 10px; box-shadow: 0 4px 14px rgba(20, 35, 40, .035); }
     [data-testid="stMetricLabel"] { color: var(--muted); }
     [data-testid="stMetricValue"] { color: var(--ink); font-family: 'Space Grotesk', sans-serif; }
+    [data-testid="stMain"] h1, [data-testid="stMain"] h2, [data-testid="stMain"] h3 { color: var(--ink) !important; }
+    [data-testid="stMain"] [data-testid="stMarkdownContainer"] p { color: var(--ink); }
+    [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3,
+    [data-testid="stSidebar"] label, [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p,
+    [data-testid="stSidebar"] [data-testid="stCaptionContainer"] { color: var(--ink) !important; }
     .section-label { color: var(--green); font-size: .72rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin: 1.8rem 0 .55rem; }
     .status-panel { background: var(--paper); border: 1px solid var(--line); border-left: 5px solid var(--amber); padding: 1.1rem 1.2rem; border-radius: 10px; margin: .5rem 0 1.25rem; }
     .status-panel strong { color: var(--ink); font-family: 'Space Grotesk', sans-serif; }
