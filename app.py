@@ -40,6 +40,9 @@ st.markdown(
     [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3,
     [data-testid="stSidebar"] label, [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p,
     [data-testid="stSidebar"] [data-testid="stCaptionContainer"] { color: var(--ink) !important; }
+    .hero h1, .hero p, .hero .hero-meta { color: #f5f8f3 !important; }
+    .hero .eyebrow { color: var(--sky) !important; }
+    .hero .hero-meta strong { color: #ffffff !important; }
     .section-label { color: var(--green); font-size: .72rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin: 1.8rem 0 .55rem; }
     .status-panel { background: var(--paper); border: 1px solid var(--line); border-left: 5px solid var(--amber); padding: 1.1rem 1.2rem; border-radius: 10px; margin: .5rem 0 1.25rem; }
     .status-panel strong { color: var(--ink); font-family: 'Space Grotesk', sans-serif; }
