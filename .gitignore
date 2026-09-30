@@ -1,0 +1,8 @@
+.venv/
+__pycache__/
+.pytest_cache/
+*.pyc
+.streamlit/
+*.egg-info/
+reports/demo_dataset.csv
+reports/feature_importance.csv
