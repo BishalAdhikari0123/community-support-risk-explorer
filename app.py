@@ -1,13 +1,15 @@
+from html import escape
 from pathlib import Path
 import sys
 
+import pandas as pd
 import plotly.express as px
 import streamlit as st
 
 ROOT = Path(__file__).parent
 sys.path.insert(0, str(ROOT / "src"))
 
-from uk_risk.data import FEATURES, make_demo_dataset, validate_dataset  # noqa: E402
+from uk_risk.data import FEATURES, load_csv_dataset, make_demo_dataset, validate_dataset  # noqa: E402
 from uk_risk.modeling import explain_row, train_model  # noqa: E402
 
 st.set_page_config(page_title="Community Support Risk Explorer", page_icon=":bar_chart:", layout="wide", initial_sidebar_state="expanded")
@@ -59,8 +61,11 @@ st.markdown(
 
 
 @st.cache_data
-def load_data():
-    frame = make_demo_dataset()
+def load_data(uploaded_bytes=None):
+    if uploaded_bytes is None:
+        frame = make_demo_dataset()
+    else:
+        return load_csv_dataset(uploaded_bytes)
     validate_dataset(frame)
     return frame
 
@@ -70,31 +75,50 @@ def load_model(frame):
     return train_model(frame)
 
 
-frame = load_data()
+with st.sidebar:
+    st.markdown("<div class='eyebrow'>Explore the model</div>", unsafe_allow_html=True)
+    st.subheader("Data source")
+    uploaded_file = st.file_uploader(
+        "Upload a real-data CSV",
+        type="csv",
+        help="The CSV must use the same columns as reports/demo_dataset.csv, including high_pressure coded as 0 or 1.",
+    )
+    data_source = "Synthetic demo data"
+    if uploaded_file is not None:
+        try:
+            frame = load_data(uploaded_file.getvalue())
+            data_source = uploaded_file.name
+            st.success(f"Using {uploaded_file.name}")
+        except (KeyError, pd.errors.EmptyDataError, pd.errors.ParserError, UnicodeDecodeError, ValueError) as error:
+            frame = load_data()
+            st.error(f"Could not use this file: {error}")
+    else:
+        frame = load_data()
+
 result = load_model(frame)
 frame["pressure_label"] = frame["high_pressure"].map({0: "Lower pressure", 1: "Higher pressure"})
+source_label = escape(data_source)
 
 st.markdown(
-    """
+    f"""
                 <div class="topline"><span class="brand">COMMUNITY / SUPPORT EXPLORER</span><span>Public interest data science · 2026 demo</span></div>
     <section class="hero">
             <div class="eyebrow">Portfolio project / public interest data science</div>
       <h1>Where could cost-of-living pressure be highest?</h1>
       <p>An explainable prioritisation view for local teams planning further research and support. Explore the model estimate, its drivers, and the uncertainty behind it.</p>
-            <div class="hero-meta"><div>Coverage<strong>180 demo areas</strong></div><div>Model<strong>Explainable baseline</strong></div><div>Purpose<strong>Prioritise investigation</strong></div></div>
+            <div class="hero-meta"><div>Coverage<strong>{len(frame)} areas</strong></div><div>Source<strong>{source_label}</strong></div><div>Purpose<strong>Prioritise investigation</strong></div></div>
     </section>
     """,
     unsafe_allow_html=True,
 )
 
 with st.sidebar:
-    st.markdown("<div class='eyebrow'>Explore the model</div>", unsafe_allow_html=True)
     st.header("Select an area")
     selected = st.selectbox("Authority", frame["authority"].sort_values().tolist())
     st.divider()
     st.subheader("Model context")
-    st.caption("Logistic regression with standardised aggregate indicators. Holdout evaluation uses 25% of the synthetic demo data.")
-    st.warning("Demo data only. This tool must not be used to decide individual eligibility or access to services.")
+    st.caption(f"Logistic regression with standardised aggregate indicators. Current source: {data_source}.")
+    st.warning("This is an area-level prioritisation aid and must not be used to decide individual eligibility or access to services.")
 
 row = frame.loc[frame["authority"] == selected].iloc[0]
 probability = float(result.model.predict_proba(row[FEATURES].to_frame().T)[0, 1])

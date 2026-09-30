@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from uk_risk.data import FEATURES, make_demo_dataset, validate_dataset
+from uk_risk.data import FEATURES, load_csv_dataset, make_demo_dataset, validate_dataset
 from uk_risk.modeling import explain_row, train_model
 
 
@@ -18,6 +18,16 @@ def test_validation_rejects_missing_columns():
     frame = make_demo_dataset().drop(columns=[FEATURES[0]])
     with pytest.raises(ValueError, match="Missing required columns"):
         validate_dataset(frame)
+
+
+def test_csv_loader_validates_real_data_contract():
+    contents = make_demo_dataset().to_csv(index=False).encode("utf-8")
+    loaded = load_csv_dataset(contents)
+    pd.testing.assert_frame_equal(loaded, make_demo_dataset())
+
+    invalid = make_demo_dataset().assign(high_pressure=2).to_csv(index=False).encode("utf-8")
+    with pytest.raises(ValueError, match="Target must contain only 0 and 1"):
+        load_csv_dataset(invalid)
 
 
 def test_model_produces_probabilities_and_explanation():

@@ -6,6 +6,8 @@ schema after joining versioned official statistics by local authority code.
 
 from __future__ import annotations
 
+from io import BytesIO
+
 import numpy as np
 import pandas as pd
 
@@ -57,6 +59,16 @@ def make_demo_dataset(n: int = 180, seed: int = 42) -> pd.DataFrame:
         "food_insecurity_pct": food.round(2),
         "high_pressure": target,
     })
+
+
+def load_csv_dataset(contents: bytes, minimum_rows: int = 20) -> pd.DataFrame:
+    """Parse and validate an uploaded dataset using the project data contract."""
+    frame = pd.read_csv(BytesIO(contents))
+    frame[FEATURES + [TARGET]] = frame[FEATURES + [TARGET]].apply(pd.to_numeric, errors="raise")
+    validate_dataset(frame)
+    if len(frame) < minimum_rows or frame[TARGET].nunique() < 2:
+        raise ValueError(f"Upload at least {minimum_rows} rows with both 0 and 1 values in high_pressure")
+    return frame
 
 
 def validate_dataset(frame: pd.DataFrame) -> None:
